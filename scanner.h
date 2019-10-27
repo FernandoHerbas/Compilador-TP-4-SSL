@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <conio.h>
-#include <ctype.h>
+//#include <conio.h> si compilas en windows
+#include <ncurses.h> //si compilas en linux#include <ctype.h>
 #include <string.h>
 
 #define FILAS 24

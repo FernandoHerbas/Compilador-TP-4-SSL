@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <conio.h> //si compilas en windows
-//#include <ncurses.h> //si compilas en linux
+#include <conio.h>
 #include <ctype.h>
 #include <string.h>
 #include "scanner.h"
@@ -10,16 +9,9 @@
 #define COLUMNAS 19
 
 #define FIN '\0'
-///caracter a analizar: primer caracter de la cadena
-///estado actual el automata: estado inicial
-///mientras haya caracteres en la cadena y el estado
-///actual no sea el del rechazo, repetir:
-///         -determinar el nuevo estado actual(estado de llegada de la
-///             transicion)
-///         -actualizar el caracter a analizar
-/// si el ultimo estado actual es un estado final, entonces la
-/// cadena procesada es una palabra del lenguaje; en caso contrario,
-/// la cadena no pertenece al lenguaje
+
+void lectura();
+const char PalabrasReservadas[][20]= {"inicio", "fin", "si", "pedir", "mostrar", "vof", "plbr", "num"};
 
 const int TT[FILAS][COLUMNAS] = {{ 1,3,5,7,10,11,13,14,15,16,17,11,18,19,20,21,22,0,24 },//0
                                  { 1,1,24,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2 },//1
@@ -63,19 +55,29 @@ int main()
         switch(Opcion)
         {
             case '1':
-                printf("\nIngrese una palabra: ");
-                scanf("%s",Dato);
-                x=leerTabla(TT,Dato,0,24);
-                if(x)
-                    printf("palabra %s reconocido.\n", Dato);
-                else
-                    printf("palabra %s rechazado.\n", Dato);
-                printf("\n");
+                lectura();
             break;
         }
     }while(Opcion != 27);
 
     return 0;
 }
-
-
+void lectura()
+{
+    char Caracter;
+    FILE *Arch = fopen("MiPrograma.txt","r");
+    while(fread(&Caracter,sizeof(Caracter),1,Arch)) //Lea el archivo y sea diferente de NULL
+    {
+        printf("El dato leido es: %c \n",Caracter);
+    }
+    return;
+}
+///Para probar la tabla
+/*printf("\nIngrese una palabra: ");
+                scanf("%s",Dato);
+                x=leerTabla(TT,Dato,0,24);
+                if(x)
+                    printf("palabra %s reconocido.\n", Dato);
+                else
+                    printf("palabra %s rechazado.\n", Dato);
+                printf("\n");*/

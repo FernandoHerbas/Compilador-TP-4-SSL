@@ -9,10 +9,10 @@
 #define FIN '\0'
 
 int columna(char);
-int leerTabla(const int [][COLUMNAS],char ,int ,int ,const int[]);
+int leerTabla(const int [][COLUMNAS],char [],int ,int ,const int[]);
 int estadoEsDeAceptacion(int ,const int [],int);
 
-int leerTabla(const int TT[][COLUMNAS],char Dato,int EstadoInicial,int EstadoRechazo,const int estadosDeAceptacion[])
+int leerTabla(const int TT[][COLUMNAS],char Dato[],int EstadoInicial,int EstadoRechazo,const int estadosDeAceptacion[])
 {
     int i=0;
     int EstadoActual = EstadoInicial;

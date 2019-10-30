@@ -64,16 +64,20 @@ int main()
 }
 void lectura()
 {
+    char Palabra[20];
     char Caracter;
-    int x[20];
+    int x;
+    int i=0;
     FILE *Arch = fopen("MiPrograma.txt","r");
     if (!Arch)
         printf("El archivo 'MiPrograma.txt' no existe");
     while(fread(&Caracter,sizeof(Caracter),1,Arch)) //Lea el archivo y sea diferente de NULL
     {
-        x = leerTabla(TT,Caracter,0,24,EstadosDeAceptacion);
-        printf("El dato leido es: %s \n",x);
+        Palabra[i] = Caracter;
+        i++;
     }
+    printf("El dato leido es: %s \n",Palabra);
+    x = leerTabla(TT,Palabra,0,24,EstadosDeAceptacion);
     return;
 }
 ///Para probar la tabla

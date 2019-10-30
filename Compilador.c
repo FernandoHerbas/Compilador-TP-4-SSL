@@ -38,12 +38,12 @@ const int TT[FILAS][COLUMNAS] = {{ 1,3,5,7,10,11,13,14,15,16,17,11,18,19,20,21,2
 									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//22
 								//	{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//23s
 									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 } };//24
-
+const int EstadosDeAceptacion []= {2,4,6,8,9,10,12,13,14,15,16,17,18,19,20,21,22};
 int main()
 {
     char Opcion;
-    char Dato[20];
-    int x;
+    int EsPalabraReservada;
+
     do
     {
         printf("1 - Para leer una palabra.\n");
@@ -55,7 +55,7 @@ int main()
         switch(Opcion)
         {
             case '1':
-                lectura();
+               lectura();
             break;
         }
     }while(Opcion != 27);
@@ -65,10 +65,14 @@ int main()
 void lectura()
 {
     char Caracter;
+    int x[20];
     FILE *Arch = fopen("MiPrograma.txt","r");
+    if (!Arch)
+        printf("El archivo 'MiPrograma.txt' no existe");
     while(fread(&Caracter,sizeof(Caracter),1,Arch)) //Lea el archivo y sea diferente de NULL
     {
-        printf("El dato leido es: %c \n",Caracter);
+        x = leerTabla(TT,Caracter,0,24,EstadosDeAceptacion);
+        printf("El dato leido es: %s \n",x);
     }
     return;
 }

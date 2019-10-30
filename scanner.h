@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <conio.h> //si compilas en windows
-//#include <ncurses.h> //si compilas en linux#include <ctype.h>
+#include <conio.h>>
 #include <string.h>
 
 #define FILAS 24
@@ -10,27 +9,22 @@
 #define FIN '\0'
 
 int columna(char);
-int leerTabla(const int [][19],char [],int ,int );
-int estadoEsDeAceptacion(int );
+int leerTabla(const int [][COLUMNAS],char ,int ,int ,const int[]);
+int estadoEsDeAceptacion(int ,const int [],int);
 
-int leerTabla(const int TT[][COLUMNAS],char Dato[],int EstadoInicial,int EstadoRechazo)
+int leerTabla(const int TT[][COLUMNAS],char Dato,int EstadoInicial,int EstadoRechazo,const int estadosDeAceptacion[])
 {
     int i=0;
     int EstadoActual = EstadoInicial;
     int ColumnaActual=0;
-    printf("Estado actual: %d \n" ,EstadoActual);
-    printf("Columna actual: %d \n" ,ColumnaActual);
-
+    int Longitud = sizeof(estadosDeAceptacion) / sizeof(estadosDeAceptacion[0]);
     while(Dato[i] != FIN && EstadoActual != EstadoRechazo)
     {
         ColumnaActual = columna(Dato[i]);
         EstadoActual = TT[EstadoActual][ColumnaActual];
-        printf("Estado actual: %d \n" ,EstadoActual);
-        printf("Columna actual: %d \n" ,ColumnaActual);
-
         i++;
     }
-    return estadoEsDeAceptacion(EstadoActual);
+    return estadoEsDeAceptacion(EstadoActual, estadosDeAceptacion, Longitud);
 }
 int columna(char letra)
 {
@@ -97,11 +91,10 @@ int columna(char letra)
          //   break;
 	}
 }
-int estadoEsDeAceptacion(int EstadoActual)
+int estadoEsDeAceptacion(int EstadoActual, const int EstadosDeAceptacion[], int Longitud)
 {
     int i;
-    int EstadosDeAceptacion []= {2,4,6,8,9,10,12,13,14,15,16,17,18,19,20,21,22};
-    for(i=0;i<16;i++)
+    for(i=0;i<Longitud;i++)
     {
         if(EstadoActual == EstadosDeAceptacion[i])
         {

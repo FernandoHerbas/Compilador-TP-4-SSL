@@ -7,24 +7,47 @@
 #define COLUMNAS 19
 
 #define FIN '\0'
+const int TT[FILAS][COLUMNAS] = {   { 1,3,5,7,10,11,13,14,15,16,17,11,18,19,20,21,22,0,24 },//0
+                                    { 1,1,24,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2 },//1
+                                    { 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//2
+                                    { 24,3,24,24,24,24,24,24,24,24,24,24,24,4,24,24,24,4,24 },//3
+									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//4
+									{ 6,6,5,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6 },//5
+									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//6
+									{ 24,24,24,24,8,9,24,24,24,24,24,24,24,24,24,24,24,24,24 },//7
+									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//8
+									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//9
+									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//10
+									{ 24,24,24,24,24,12,24,24,24,24,24,24,24,24,24,24,24,24,24 },//11
+									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//12
+									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//13
+									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//14
+									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//15
+									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//16
+									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//17
+									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//18
+									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//19
+									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//20
+									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//21
+									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//22
+								//	{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//23s
+									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 } };//24
+
+const int EstadosCentinelas []= {2,4,6,8,9,10,12,13,14,15,16,17,18,19,20,21,22};
+
+
+
+
+typedef enum Tokens = {PalabraReservada, CaracteresDePuntacion, Operadores};
 
 int columna(char);
-int leerTabla(const int [][COLUMNAS],char [],int ,int ,const int[]);
-int estadoEsDeAceptacion(int ,const int [],int);
+int leerTabla(int ,int );
+int centinelas(int ,int);
 
-int leerTabla(const int TT[][COLUMNAS],char Dato[],int EstadoInicial,int EstadoRechazo,const int estadosDeAceptacion[])
+int leerTabla(int EstadoInicial,int EstadoRechazo)
 {
-    int i=0;
-    int EstadoActual = EstadoInicial;
-    int ColumnaActual=0;
-    int Longitud = sizeof(estadosDeAceptacion) / sizeof(estadosDeAceptacion[0]);
-    while(Dato[i] != FIN && EstadoActual != EstadoRechazo)
-    {
-        ColumnaActual = columna(Dato[i]);
-        EstadoActual = TT[EstadoActual][ColumnaActual];
-        i++;
-    }
-    return estadoEsDeAceptacion(EstadoActual, estadosDeAceptacion, Longitud);
+
+    return 0;
 }
 int columna(char letra)
 {
@@ -91,15 +114,19 @@ int columna(char letra)
          //   break;
 	}
 }
-int estadoEsDeAceptacion(int EstadoActual, const int EstadosDeAceptacion[], int Longitud)
+int centinelas(int EstadoActual, int Longitud)
 {
     int i;
     for(i=0;i<Longitud;i++)
     {
-        if(EstadoActual == EstadosDeAceptacion[i])
+        if(EstadoActual == EstadosCentinelas[i])
         {
             return 1;
         }
     }
     return 0;
+}
+void lectura()
+{
+
 }

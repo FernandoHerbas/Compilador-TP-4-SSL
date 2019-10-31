@@ -3,24 +3,25 @@
 #include <conio.h>
 #include <ctype.h>
 #include <string.h>
-#include "scanner.h"
+//#include "scanner.h"
 
 #define FILAS 24
 #define COLUMNAS 19
 
 #define FIN '\0'
-
-void lectura();
-const char PalabrasReservadas[][20]= {"inicio", "fin", "si", "pedir", "mostrar", "vof", "plbr", "num"};
-
-const int TT[FILAS][COLUMNAS] = {{ 1,3,5,7,10,11,13,14,15,16,17,11,18,19,20,21,22,0,24 },//0
-                                 { 1,1,24,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2 },//1
-                                 { 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//2
-                                 { 24,3,24,24,24,24,24,24,24,24,24,24,24,4,24,24,24,4,24 },//3
+/// El ANÁLISIS SINTÁCTICO es realizado por un módulo llamado Parser.
+/// Este analizador procesa los tokens que le entrega el Scanner hasta que reconoce
+/// una construcción sintáctica que requiere un procesamiento semántico.
+/// Entonces, invoca directamente a la rutina semántica que corresponde.
+//                                    0 1 2 3 4  5  6  7  8  9  10 11 12 13 14 15 16 17 18
+const int TT[FILAS][COLUMNAS] = {   { 1,3,5,7,10,11,13,14,15,16,17,11,18,19,20,21,22,0 ,24 },    //0
+                                    { 1,1,24,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2 },                  //1
+                                    { 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//2
+                                    { 24,3,24,24,24,24,24,24,24,24,24,24,24,4,24,24,24,4,24 },   //3
 									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//4
-									{ 6,6,5,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6 },//5
+									{ 6,6,5,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6 },                   //5
 									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//6
-									{ 24,24,24,24,8,9,24,24,24,24,24,24,24,24,24,24,24,24,24 },//7
+									{ 24,24,24,24,8,9,24,24,24,24,24,24,24,24,24,24,24,24,24 },  //7
 									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//8
 									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//9
 									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//10
@@ -38,12 +39,28 @@ const int TT[FILAS][COLUMNAS] = {{ 1,3,5,7,10,11,13,14,15,16,17,11,18,19,20,21,2
 									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//22
 								//	{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//23s
 									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 } };//24
-const int EstadosDeAceptacion []= {2,4,6,8,9,10,12,13,14,15,16,17,18,19,20,21,22};
+
+const int EstadosCentinelas []= {2,4,6,8,9,10,12,13,14,15,16,17,18,19,20,21,22};
+
+int centinelas(int);
+int columna(char);
+
+const char PalabrasReservadas[][20]= {"inicio", "fin", "si", "pedir", "mostrar", "vof", "plbr", "num"};
+
+
 int main()
 {
     char Opcion;
-    int EsPalabraReservada;
-
+    char CodigoFuente[] = "MiPrograma.txt";
+    //int i=0;
+    int EstadoActual  =0;
+    int ColumnaActual =0;
+    int EstadoRechazo =24;
+    //int Longitud = sizeof(estadosDeAceptacion) / sizeof(estadosDeAceptacion[0]);
+    char Caracter;
+    FILE *Arch = fopen(CodigoFuente,"r");
+    if (!Arch)
+        printf("El archivo '%s' no existe.\n", CodigoFuente);
     do
     {
         printf("1 - Para leer una palabra.\n");
@@ -55,30 +72,98 @@ int main()
         switch(Opcion)
         {
             case '1':
-               lectura();
+            //fread(&Caracter,sizeof(Caracter),1,Arch);
+            // Longitud)  &&&& centinelas(EstadoActual)
+            while(EstadoActual != EstadoRechazo && !feof(Arch))
+            {
+                Caracter = fgetc(Arch);
+                ColumnaActual = columna(Caracter);
+                EstadoActual = TT[EstadoActual][ColumnaActual];
+                printf("letra: %c\t, estado: %d \n", Caracter, EstadoActual);
+            }
+            fclose(Arch);
             break;
         }
     }while(Opcion != 27);
 
     return 0;
 }
-void lectura()
+int columna(char letra)
 {
-    char Palabra[20];
-    char Caracter;
-    int x;
-    int i=0;
-    FILE *Arch = fopen("MiPrograma.txt","r");
-    if (!Arch)
-        printf("El archivo 'MiPrograma.txt' no existe");
-    while(fread(&Caracter,sizeof(Caracter),1,Arch)) //Lea el archivo y sea diferente de NULL
+    if(isalpha(letra) == 1)
     {
-        Palabra[i] = Caracter;
-        i++;
+        return 0;               //Retorna la columna de mayuscula
     }
-    printf("El dato leido es: %s \n",Palabra);
-    x = leerTabla(TT,Palabra,0,24,EstadosDeAceptacion);
-    return;
+    if(isalpha(letra) == 2)
+    {
+        return 1;               //Retorna la columna de minuscula
+    }
+    if(isdigit(letra))
+        return 2;                //Retorna la columna de numeros
+
+    switch(letra)
+	{
+		case '<':
+			return 3;
+			break;
+		case '-':
+			return 4;
+			break;
+		case '=':
+			return 5;
+			break;
+		case '+':
+			return 6;
+			break;
+		case '*':
+			return 7;
+			break;
+		case '/':
+			return 8;
+			break;
+		case '|':
+			return 9;
+			break;
+		case '&':
+			return 10;
+			break;
+		case '>':
+			return 11;
+			break;
+		case '.':
+			return 12;
+			break;
+		case '(':
+			return 13;
+			break;
+		case ')':
+			return 14;
+			break;
+		case '[':
+			return 15;
+			break;
+		case ']':
+			return 16;
+			break;
+		case ' ':
+			return 17;
+			break;
+		default:
+            return 18;
+         //   break;
+	}
+}
+int centinelas(int EstadoActual)
+{
+    int i;
+    for(i=0;i<16;i++)
+    {
+        if(EstadoActual == EstadosCentinelas[i])
+        {
+            return 1;
+        }
+    }
+    return 0;
 }
 ///Para probar la tabla
 /*printf("\nIngrese una palabra: ");

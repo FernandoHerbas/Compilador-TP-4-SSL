@@ -42,17 +42,19 @@ const int TT[FILAS][COLUMNAS] = {   { 1,3,5,7,10,11,13,14,15,16,17,11,18,19,20,2
 
 const int EstadosCentinelas []= {2,4,6,8,9,10,12,13,14,15,16,17,18,19,20,21,22};
 
-int centinelas(int);
+int esEstadoCentinela(int);
 int columna(char);
+void insertarCaracterA(char *,char);
+char *esPalabraReservada(char []);
 
-const char PalabrasReservadas[][20]= {"inicio", "fin", "si", "pedir", "mostrar", "vof", "plbr", "num"};
+const char PalabrasReservadas[][20]= {"inicio ", "fin", "si", "pedir", "mostrar", "vof", "plbr", "num"};
 
 
 int main()
 {
     char Opcion;
     char CodigoFuente[] = "MiPrograma.txt";
-    //int i=0;
+    char Lexema[20];
     int EstadoActual  =0;
     int ColumnaActual =0;
     int EstadoRechazo =24;
@@ -74,14 +76,19 @@ int main()
             case '1':
             //fread(&Caracter,sizeof(Caracter),1,Arch);
             // Longitud)  &&&& centinelas(EstadoActual)
-            while(EstadoActual != EstadoRechazo && !feof(Arch))
+            while(!esEstadoCentinela(EstadoActual) && EstadoActual != EstadoRechazo && !feof(Arch))
             {
                 Caracter = fgetc(Arch);
+                insertarCaracterA(Lexema,Caracter);
                 ColumnaActual = columna(Caracter);
                 EstadoActual = TT[EstadoActual][ColumnaActual];
                 printf("letra: %c\t, estado: %d \n", Caracter, EstadoActual);
             }
+            //ungetc(Caracter,Arch);
             fclose(Arch);
+            printf("\nLexema: %s\n", Lexema);
+
+            printf("Es palabra reservada? %s \n", esPalabraReservada(Lexema));
             break;
         }
     }while(Opcion != 27);
@@ -153,7 +160,7 @@ int columna(char letra)
          //   break;
 	}
 }
-int centinelas(int EstadoActual)
+int esEstadoCentinela(int EstadoActual)
 {
     int i;
     for(i=0;i<16;i++)
@@ -165,6 +172,37 @@ int centinelas(int EstadoActual)
     }
     return 0;
 }
+void insertarCaracterA(char *Lexema,char Caracter)
+{
+    int i=0;
+    if(!Lexema)
+    {
+        *Lexema = Caracter;
+    }
+    else
+    {
+        while(*(Lexema+i) != FIN)
+        {
+            i++;
+        }
+        *(Lexema+i) = Caracter;
+    }
+    *(Lexema+i+1) = FIN;
+    return;
+}
+char *esPalabraReservada(char Lexema[])
+{
+    int i;
+    for(i=0;PalabrasReservadas[i][20] != FIN;i++)
+    {
+        if(!strcmp(PalabrasReservadas[i],Lexema))
+        {
+            return "sep";
+        }
+    }
+    return "nop";
+}
+
 ///Para probar la tabla
 /*printf("\nIngrese una palabra: ");
                 scanf("%s",Dato);

@@ -9,10 +9,10 @@
 #define COLUMNAS 19
 
 #define FIN '\0'
-/// El ANÁLISIS SINTÁCTICO es realizado por un módulo llamado Parser.
+/// El ANï¿½LISIS SINTï¿½CTICO es realizado por un modulo llamado Parser.
 /// Este analizador procesa los tokens que le entrega el Scanner hasta que reconoce
-/// una construcción sintáctica que requiere un procesamiento semántico.
-/// Entonces, invoca directamente a la rutina semántica que corresponde.
+/// una construcciï¿½n sintï¿½ctica que requiere un procesamiento semï¿½ntico.
+/// Entonces, invoca directamente a la rutina semï¿½ntica que corresponde.
 //
 void listaSentencias();
 
@@ -30,7 +30,7 @@ int main()
         switch(Opcion)
         {
             case '1':
-            lectura();
+
         }
     }while(Opcion != 27);
 

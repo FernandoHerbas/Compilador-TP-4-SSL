@@ -1,12 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <conio.h>>
+#include <conio.h>
 #include <string.h>
 
 #define FILAS 24
 #define COLUMNAS 19
 
 #define FIN '\0'
+typedef struct nodo
+{
+    char dato[20];
+    struct nodo *sgte;
+}Lexemas;
 const int TT[FILAS][COLUMNAS] = {   { 1,3,5,7,10,11,13,14,15,16,17,11,18,19,20,21,22,0,24 },//0
                                     { 1,1,24,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2 },//1
                                     { 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 },//2
@@ -34,21 +39,50 @@ const int TT[FILAS][COLUMNAS] = {   { 1,3,5,7,10,11,13,14,15,16,17,11,18,19,20,2
 									{ 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24 } };//24
 
 const int EstadosCentinelas []= {2,4,6,8,9,10,12,13,14,15,16,17,18,19,20,21,22};
+const char PalabrasReservadas[][20]= {"inicio", "fin", "si", "pedir", "mostrar", "vof", "plbr", "num"};
 
-
-
-
-typedef enum Tokens = {PalabraReservada, CaracteresDePuntacion, Operadores};
-
+void lectura(void);
+int esEstadoCentinela(int);
+void insertarCaracterA(char *,char);
+char *esPalabraReservada(char []);
 int columna(char);
-int leerTabla(int ,int );
-int centinelas(int ,int);
+void eliminarUltimo(char *);
+void chequear(char *);
+void insertarLexemaA(Lexemas *,char []);
 
-int leerTabla(int EstadoInicial,int EstadoRechazo)
+void lectura(void)
 {
-
-    return 0;
+    char CodigoFuente[] = "MiPrograma.txt";
+    FILE *Arch = fopen(CodigoFuente,"r");
+    if (!Arch)
+        printf("El archivo '%s' no existe.\n", CodigoFuente);
+    char Caracter;
+    char Lexema[20];
+    int EstadoActual  =0;
+    int ColumnaActual =0;
+    int EstadoRechazo =24;
+    Lexemas *misLexemas = NULL;
+    Lexema[0] = FIN;
+    while(!feof(Arch))
+    {
+        Caracter = fgetc(Arch);
+        while(!esEstadoCentinela(EstadoActual) && EstadoActual != EstadoRechazo)
+        {
+            insertarCaracterA(Lexema,Caracter);
+            ColumnaActual = columna(Caracter);
+            EstadoActual = TT[EstadoActual][ColumnaActual];
+            printf("caracteres: %c\n",Caracter);
+            Caracter = fgetc(Arch);
+        }
+        ungetc(Caracter,Arch);
+        eliminarUltimo(Lexema);
+       // chequear(Lexema);
+        //insertarLexemaA(misLexemas,Lexema);
+    }
+    fclose(Arch);
+    return;
 }
+
 int columna(char letra)
 {
     if(isalpha(letra) == 1)
@@ -111,13 +145,12 @@ int columna(char letra)
 			break;
 		default:
             return 18;
-         //   break;
 	}
 }
-int centinelas(int EstadoActual, int Longitud)
+int esEstadoCentinela(int EstadoActual)
 {
     int i;
-    for(i=0;i<Longitud;i++)
+    for(i=0;i<16;i++)
     {
         if(EstadoActual == EstadosCentinelas[i])
         {
@@ -126,7 +159,64 @@ int centinelas(int EstadoActual, int Longitud)
     }
     return 0;
 }
-void lectura()
+void insertarCaracterA(char *Lexema,char Caracter)
 {
+    int i=0;
+    if(!Lexema)
+    {
+        *Lexema = Caracter;
+    }
+    else
+    {
+        while(*(Lexema+i) != FIN)
+        {
+            i++;
+        }
+        *(Lexema+i) = Caracter;
+    }
+    *(Lexema+i+1) = FIN;
+    return;
+}
+char *esPalabraReservada(char Lexema[])
+{
+    int i;
+    for(i=0;PalabrasReservadas[i][20] != FIN;i++)
+    {
+        if(!strcmp(PalabrasReservadas[i],Lexema))
+        {
+            return "sep";
+        }
+    }
+    return "nop";
+}
+void chequear(char Lexema[])
+{
+    printf("\nLexema: %s\n", Lexema);
+    printf("Es palabra reservada? %s \n", esPalabraReservada(Lexema));
 
+    return;
+}
+void eliminarUltimo(char Lexema[])
+{
+    int i;
+    while(Lexema[i]!= FIN)i++;
+    Lexema[i-1] = FIN;
+    return;
+}
+void insertarLexemaA(Lexemas *misLexemas, char Lexema[])
+{
+    Lexemas *nuevo ;
+    nuevo = (Lexemas*)malloc(sizeof(Lexemas)); //reservo espacio en memoria
+    strcpy(nuevo->dato,Lexema);
+    if(misLexemas)
+    {
+        nuevo->sgte = misLexemas->sgte;
+        misLexemas->sgte = nuevo;
+    }
+    else
+    {
+        nuevo->sgte = misLexemas;
+        misLexemas = nuevo;
+    }
+    return;
 }

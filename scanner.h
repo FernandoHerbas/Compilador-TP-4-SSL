@@ -3,7 +3,7 @@
 #include <conio.h>
 #include <string.h>
 
-#define FIN '\0'
+#define FINCHAR '\0'
 
 #define FILAS 22
 #define COLUMNAS 18
@@ -11,17 +11,16 @@
 
 #define ESPACIO 16
 #define ESTADORECHAZO 21
-typedef enum{INICIO,FIN,ID,PLBRRESERVADA,CONSTANTE,PARENIZQUIERDO,PARENDERECHO,CORCHETEIZQ,CORCHETEDER,PUNTO,ASGINACION
+typedef enum{INICIO,FIN,ID,PLBRRESERVADA,CONSTANTE,PARENIZQUIERDO,PARENDERECHO,CORCHETEIZQ,CORCHETEDER,PUNTO,ASIGNACION
             SUMA,RESTA,PRODUCTO,AND,IGUAL,FDT,ERRORLEXICO}TOKEN; 
 /*--------------------------------------Declaracion de funciones-----------------------*/
-TOKEN scanner();
+TOKEN scanner(FILE *);
 
-void lectura(void);
 int esEstadoFinal(int);
 int columna(char);
 void chequear(char *);            
 /*----------------------------------------Datos globales-------------------------------*/               
-//                                    0 ,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10,12,13,14,15,16,17
+//                                    0 ,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10,11,12,13,14,15,16
 const int TT[FILAS][COLUMNAS] = {   { 1 ,3 ,5 ,7 ,9 ,10,12,13,14,15,16,17,18,19,20,0 ,21},//0
                                     { 1 ,1 ,2 ,2 ,2 ,2 ,2 ,2 ,2 ,2 ,2 ,2 ,2 ,2 ,2 ,2 ,2 },//1
                                     { 21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21},//2
@@ -30,10 +29,10 @@ const int TT[FILAS][COLUMNAS] = {   { 1 ,3 ,5 ,7 ,9 ,10,12,13,14,15,16,17,18,19,
 									{ 21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21},//4
 									{ 6 ,6 ,5 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 },//5
 									{ 21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21},//6
-									{ 8 ,8 ,8 ,8 ,7 ,8 ,8 ,8 ,8 ,8 ,8 ,8 ,8 ,8 ,8 ,8 ,8 },//7
+									{ 21,21,21,21,8 ,21,21,21,21,21,21,21,21,21,21,21,21},//7
 									{ 21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21},//8
 									{ 21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21},//9
-									{ 11,11,11,11,11,10,11,11,11,11,11,11,11,11,11,11,11},//10
+									{ 21,21,21,21,21,11,21,21,21,21,21,21,21,21,21,21,21},//10
 									{ 21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21},//11
 									{ 21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21},//12
 									{ 21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21},//13
@@ -50,7 +49,7 @@ const int EstadosFinales []= {2,4,6,8,9,11,12,13,14,15,16,17,18,19,20};
 const char PalabrasReservadas[][20]= {"inicio", "fin", "si", "pedir", "mostrar", "vof", "plbr", "num"};
 char Buffer[TAMMAX];
 
-TOKEN scanner(){
+TOKEN scanner(FILE *Arch){
     char Caracter;
     int  Columna;
     int  Estado = 0;
@@ -65,46 +64,34 @@ TOKEN scanner(){
             Buffer[i] = Caracter;
             i++;
         } 
-    }while(!esEstadoFinal(Estado) && Estado != ESTADORECHAZO);+
-    Buffer[i] = FIN;
+    }while(!esEstadoFinal(Estado) && Estado != ESTADORECHAZO);
+    Buffer[i] = FINCHAR;
     switch(Estado)
     {
         case 2:
             if(Estado != ESPACIO)
             {
                 ungetc(Caracter,Arch);
-                Buffer[i-1] = FIN;
+                Buffer[i-1] = FINCHAR;
             }
             return ID;
         case 4:
             if(Estado != ESPACIO)
             {
                 ungetc(Caracter,Arch);
-                Buffer[i-1] = FIN;
+                Buffer[i-1] = FINCHAR;
             }
             return PLBRRESERVADA;
         case 6: 
             if(Estado != ESPACIO)
             {
                 ungetc(Caracter,Arch);
-                Buffer[i-1] = FIN;
+                Buffer[i-1] = FINCHAR;
             }
             return CONSTANTE;
-        case 8:
-            if(Estado != ESPACIO)
-            {
-                ungetc(Caracter,Arch);
-                Buffer[i-1] = FIN;
-            }
-            return ASGINACION;
-        case 11:
-            if(Estado != ESPACIO)
-            {
-                ungetc(Caracter,Arch);
-                Buffer[i-1] = FIN;
-            }
-            return IGUAL;
-        case 9:  return RESTA;
+        case 8 : return ASIGNACION;
+        case 11: return IGUAL;
+        case 9 : return RESTA;
         case 12: return SUMA;
         case 13: return PRODUCTO;
         case 14: return AND;
@@ -156,7 +143,7 @@ int esEstadoFinal(int EstadoActual)
 char *esPalabraReservada(char Lexema[])
 {
     int i;
-    for(i=0;PalabrasReservadas[i][20] != FIN;i++)
+    for(i=0;PalabrasReservadas[i][20] != FINCHAR;i++)
     {
         if(!strcmp(PalabrasReservadas[i],Lexema))
         {
@@ -173,7 +160,7 @@ void chequear(char Lexema[])
     return;
 }
 
-void lectura(void)
+/*void lectura(void)
 {
     char CodigoFuente[] = "MiPrograma.txt";
     FILE *Arch = fopen(CodigoFuente,"r");
@@ -204,4 +191,4 @@ void lectura(void)
     }
     fclose(Arch);
     return;
-}
+}*/

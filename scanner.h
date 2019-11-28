@@ -12,14 +12,14 @@
 #define ESPACIO 16
 #define ESTADORECHAZO 21
 typedef enum{INICIO,FIN,ID,PLBRRESERVADA,CONSTANTE,PARENIZQUIERDO,PARENDERECHO,CORCHETEIZQ,CORCHETEDER,PUNTO,ASIGNACION
-            SUMA,RESTA,PRODUCTO,AND,IGUAL,FDT,ERRORLEXICO}TOKEN; 
+            SUMA,RESTA,PRODUCTO,AND,IGUAL,FDT,ERRORLEXICO}TOKEN;
 /*--------------------------------------Declaracion de funciones-----------------------*/
 TOKEN scanner(FILE *);
 
 int esEstadoFinal(int);
 int columna(char);
-void chequear(char *);            
-/*----------------------------------------Datos globales-------------------------------*/               
+void chequear(char *);
+/*----------------------------------------Datos globales-------------------------------*/
 //                                    0 ,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10,11,12,13,14,15,16
 const int TT[FILAS][COLUMNAS] = {   { 1 ,3 ,5 ,7 ,9 ,10,12,13,14,15,16,17,18,19,20,0 ,21},//0
                                     { 1 ,1 ,2 ,2 ,2 ,2 ,2 ,2 ,2 ,2 ,2 ,2 ,2 ,2 ,2 ,2 ,2 },//1
@@ -43,7 +43,7 @@ const int TT[FILAS][COLUMNAS] = {   { 1 ,3 ,5 ,7 ,9 ,10,12,13,14,15,16,17,18,19,
 									{ 21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21},//18
 									{ 21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21},//19
 									{ 21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21},//20
-									{ 21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21}};//21 
+									{ 21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21}};//21
 
 const int EstadosFinales []= {2,4,6,8,9,11,12,13,14,15,16,17,18,19,20};
 const char PalabrasReservadas[][20]= {"inicio", "fin", "si", "pedir", "mostrar", "vof", "plbr", "num"};
@@ -63,7 +63,7 @@ TOKEN scanner(FILE *Arch){
         {
             Buffer[i] = Caracter;
             i++;
-        } 
+        }
     }while(!esEstadoFinal(Estado) && Estado != ESTADORECHAZO);
     Buffer[i] = FINCHAR;
     switch(Estado)
@@ -82,7 +82,7 @@ TOKEN scanner(FILE *Arch){
                 Buffer[i-1] = FINCHAR;
             }
             return PLBRRESERVADA;
-        case 6: 
+        case 6:
             if(Estado != ESPACIO)
             {
                 ungetc(Caracter,Arch);
@@ -135,7 +135,7 @@ int esEstadoFinal(int EstadoActual)
     int i;
     for(i=0;i<16;i++)
     {
-        if(EstadoActual == EstadosFinales[i]) 
+        if(EstadoActual == EstadosFinales[i])
             return 1;
     }
     return 0;

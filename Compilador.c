@@ -3,7 +3,6 @@
 #include <conio.h>
 #include <ctype.h>
 #include <string.h>
-//#include "scanner.h"
 
 #define FINCHAR '\0'
 
@@ -17,6 +16,27 @@
 typedef enum{INICIO,FIN,SI,CONSTANTE,ID,PLBRRESERVADA,PARENIZQUIERDO,PARENDERECHO,CORCHETEIZQ,CORCHETEDER,
             PUNTO,ASIGNACION,SUMA,RESTA,PRODUCTO,AND,IGUAL,FDT,ERRORLEXICO}TOKEN;
 
+/*--------------------------------------Declaracion de funciones-----------------------*/
+
+void objetivo(void);
+void programa(void);
+void listaSentencias();
+void sentencia();
+void expresion();
+void primaria();
+
+void match(TOKEN );
+void matchear(TOKEN);
+TOKEN proximoToken();
+void errorLexico();
+void errorSintactico();
+void chequear(char *);
+void mostrarMensajeCompilacionExitosa();
+
+TOKEN scanner();
+int esEstadoFinal(int);
+int columna(char);
+/*-----------------------Variables y constantes globales--------------------------*/
 //                                 0 ,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10,11,12,13,14,15,16
 const int TT[FILAS][COLUMNAS] = {{ 1 ,3 ,5 ,7 ,9 ,10,12,13,14,15,16,17,18,19,20,0 ,21},//0
                                  { 1 ,1 ,2 ,2 ,2 ,2 ,2 ,2 ,2 ,2 ,2 ,2 ,2 ,2 ,2 ,2 ,2 },//1
@@ -42,42 +62,20 @@ const int TT[FILAS][COLUMNAS] = {{ 1 ,3 ,5 ,7 ,9 ,10,12,13,14,15,16,17,18,19,20,
                                  { 21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21}};//21
 
 const int EstadosFinales []= {2,4,6,8,9,11,12,13,14,15,16,17,18,19,20};
-const char PalabrasReservadas[][20]= {"inicio", "fin", "si", "vof", "plbr", "num"};
+
 char Buffer[TAMMAX];
 int flagToken = 0;
 TOKEN tokenActual;
-/*--------------------------------------Declaracion de funciones-----------------------*/
-
-void objetivo(void);
-void programa(void);
-void listaSentencias();
-void sentencia();
-
-
-void match(TOKEN );
-void matchear(TOKEN);
-TOKEN proximoToken();
-void errorLexico();
-void errorSintactico();
-TOKEN buscarPalabraReservada(char *);
-void chequear(char *);
-
-TOKEN scanner();
-int esEstadoFinal(int);
-int columna(char);
-
 FILE *Arch;
-/************************Programa Principal************************/
+/*-----------------------Programa Principal--------------------------*/
 int main()
 {
     char CodigoFuente[] = "MiPrograma.txt";
     Arch = fopen(CodigoFuente,"r");
     if (!Arch)
         printf("El archivo '%s' no existe.\n", CodigoFuente);
-/**********************Inicio Compilacion***************************/
-
-    objetivo();
-/***********************Se cierra el Archivo Fuente******************/
+    objetivo();   // Comienza la lectura del archivo.
+    mostrarMensajeCompilacionExitosa();
     fclose(Arch);
     return 0;
 }
@@ -120,29 +118,58 @@ void sentencia()
         case SI:
             match(SI);
             match(PARENIZQUIERDO);
-            //match(PUNTO);
+            expresion();
             match(PARENDERECHO);
             match(CORCHETEIZQ);
+            listaSentencias();
             match(CORCHETEDER);
             break;
         case ID:
             match(ID);
             match(ASIGNACION);
-            //expresion();
+            expresion();
             match(PUNTO);
             break;
         default: break;
     }
 }
 
-/*void expresion()
+void expresion()
 {
     TOKEN tok;
-    for(tok = proximoToken(); tok == SUMA || tok == RESTA; tok = proximoToken();)
-    {
-        expAnd();
+    primaria();
+    for(tok = proximoToken(); tok == SUMA || tok == RESTA || tok == AND || tok == IGUAL; tok = proximoToken()){
+        operadorAditivo();
+        primaria();
     }
-}*/
+    return;
+
+}
+
+void primaria()
+{
+    TOKEN tok = proximoToken();
+    switch(tok)
+    {
+        case CONSTANTE:
+            match(CONSTANTE);
+            break;
+        case ID:
+            match(ID);
+            break;
+        default : errorSintactico();break;
+    }
+}
+void operadorAditivo(){
+    TOKEN tok = proximoToken();
+    if(tok == SUMA || tok == RESTA || tok == AND || tok == IGUAL){
+        match(tok);
+    }
+    else
+        errorSintactico();
+    return;
+}
+
 
 void match(TOKEN tok)
 {
@@ -183,20 +210,6 @@ TOKEN proximoToken()
 void errorLexico() {  printf("Error Lexico\n"); }
 void errorSintactico() {  printf("Error Sintactico\n"); }
 
-/*
-TOKEN buscarPalabraReservada(char *id)
-{
-    if(!strcmp(id,"inicio")) return INICIO;
-    if(!strcmp(id,"fin"))    return FIN;
-    if(!strcmp(id,"num"))    return NUM;
-    if(!strcmp(id,"vof"))    return VOF;
-    if(!strcmp(id,"plbr"))   return PLBR;
-    if(!strcmp(id,"si"))     return SI;
-
-    return ERRORLEXICO;
-}*/
-
-
 TOKEN scanner(){
     char Caracter;
     int  Columna;
@@ -213,10 +226,8 @@ TOKEN scanner(){
             Buffer[i] = Caracter;
             i++;
         }
-        printf("Estado: %d \t Columna: %d \n", Estado,Columna);
     }while(!esEstadoFinal(Estado) && Estado != ESTADORECHAZO);
     Buffer[i] = FINCHAR;
-    printf("buffer: %s \n",Buffer);
     switch(Estado)
     {
         case 2:
@@ -231,7 +242,6 @@ TOKEN scanner(){
             {
                 ungetc(Caracter,Arch);
                 Buffer[i-1] = FINCHAR;
-                printf("buffer: %s \n",Buffer);
             }
             return PLBRRESERVADA;
         case 6:
@@ -291,5 +301,8 @@ int esEstadoFinal(int EstadoActual)
             return 1;
     }
     return 0;
+}
+void mostrarMensajeCompilacionExitosa(){
+    printf("Compilacion exitosa.");
 }
 

@@ -1,6 +1,6 @@
 inicio.
 Contador <- 1+2.
-si(Contador = 3)[
+si(Contador == 3)[
 UnaVariable <- 4.
 ]
 fin.

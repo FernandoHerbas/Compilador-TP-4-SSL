@@ -24,6 +24,7 @@ void listaSentencias();
 void sentencia();
 void expresion();
 void primaria();
+void operadorAditivo();
 
 void match(TOKEN );
 TOKEN proximoToken();
@@ -66,6 +67,7 @@ char Buffer[TAMMAX];
 int flagToken = 0;
 TOKEN tokenActual;
 FILE *Arch;
+int Error = 0;
 /*-----------------------Programa Principal--------------------------*/
 int main()
 {
@@ -74,7 +76,8 @@ int main()
     if (!Arch)
         printf("El archivo '%s' no existe.\n", CodigoFuente);
     objetivo();   // Comienza la lectura del archivo.
-    mostrarMensajeCompilacionExitosa();
+    if(!Error)
+        mostrarMensajeCompilacionExitosa();
     fclose(Arch);
     return 0;
 }
@@ -156,7 +159,10 @@ void primaria()
         case ID:
             match(ID);
             break;
-        default : errorSintactico();break;
+        default :
+            errorSintactico();
+            Error = -1;
+            break;
     }
 }
 void operadorAditivo(){
@@ -164,8 +170,10 @@ void operadorAditivo(){
     if(tok == SUMA || tok == RESTA || tok == AND || tok == IGUAL){
         match(tok);
     }
-    else
+    else{
         errorSintactico();
+        Error = -1;
+    }
     return;
 }
 
@@ -175,6 +183,7 @@ void match(TOKEN tok)
     if(!(tok == proximoToken()))
     {
         errorSintactico();
+        Error = -1;
     }
     flagToken = 0;
     return;
@@ -186,8 +195,10 @@ TOKEN proximoToken()
     if(!flagToken)
     {
         tokenActual = scanner();
-        if(tokenActual == ERRORLEXICO)
+        if(tokenActual == ERRORLEXICO){
             errorLexico();
+            Error = -2;
+        }
         flagToken = 1;
         if(tokenActual == PLBRRESERVADA)
         {

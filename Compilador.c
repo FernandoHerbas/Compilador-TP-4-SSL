@@ -26,7 +26,6 @@ void expresion();
 void primaria();
 
 void match(TOKEN );
-void matchear(TOKEN);
 TOKEN proximoToken();
 void errorLexico();
 void errorSintactico();
